@@ -151,7 +151,7 @@ class GeminiClient:
         model = request.model
         format_type = getattr(request, 'format_type', None)
         if format_type and (format_type == "gemini"):
-            api_version = "v1alpha" if "think" in request.model else "v1beta"
+            api_version = "v1alpha" if "think" in request.model or request.thinking_budget is not None else "v1beta"
             if request.payload:
                 # 将 Pydantic 模型转换为字典, 假设 Pydantic V2+
                 data = request.payload.model_dump(exclude_none=True)
