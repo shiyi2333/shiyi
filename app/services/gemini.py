@@ -194,7 +194,7 @@ class GeminiClient:
             }
         generationConfig = {k: v for k, v in config_params.items() if v is not None}
         
-        api_version = "v1alpha" if "think" in request.model else "v1beta"
+        api_version = "v1alpha" if "think" in request.model or request.thinking_budget is not None else "v1beta"
         
         data = {
             "contents": contents,
