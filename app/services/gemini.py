@@ -202,69 +202,69 @@ class GeminiClient:
             "safetySettings": safety_settings,
         }
 
-        # --- 函数调用处理 ---
-        # 1. 添加 tools (函数声明)
-        function_declarations = []
-        if request.tools:
-            # 显式提取 Gemini API 所需的字段，避免包含 'id' 等无效字段
-            function_declarations = []
-            for tool in request.tools:
-                if tool.get("type") == "function":
-                    func_def = tool.get("function")
-                    if func_def:
-                        # 只包含 Gemini API 接受的字段
-                        declaration = {
-                            "name": func_def.get("name"),
-                            "description": func_def.get("description"),
-                        }
-                        # 获取 parameters 并移除可能存在的 $schema 字段
-                        parameters = func_def.get("parameters")
-                        if isinstance(parameters, dict) and "$schema" in parameters:
-                            parameters = parameters.copy() 
-                            del parameters["$schema"]
-                        if parameters is not None:
-                            declaration["parameters"] = parameters
+       #  # --- 函数调用处理 ---
+       #  # 1. 添加 tools (函数声明)
+       #  function_declarations = []
+       #  if request.tools:
+       #      # 显式提取 Gemini API 所需的字段，避免包含 'id' 等无效字段
+       #      function_declarations = []
+       #      for tool in request.tools:
+       #          if tool.get("type") == "function":
+       #              func_def = tool.get("function")
+       #              if func_def:
+       #                  # 只包含 Gemini API 接受的字段
+       #                  declaration = {
+       #                      "name": func_def.get("name"),
+       #                      "description": func_def.get("description"),
+       #                  }
+       #                  # 获取 parameters 并移除可能存在的 $schema 字段
+       #                  parameters = func_def.get("parameters")
+       #                  if isinstance(parameters, dict) and "$schema" in parameters:
+       #                      parameters = parameters.copy() 
+       #                      del parameters["$schema"]
+       #                  if parameters is not None:
+       #                      declaration["parameters"] = parameters
 
-                        # 移除值为 None 的键，以保持 payload 清洁
-                        declaration = {k: v for k, v in declaration.items() if v is not None}
-                        if declaration.get("name"): # 确保 name 存在
-                            function_declarations.append(declaration)
+       #                  # 移除值为 None 的键，以保持 payload 清洁
+       #                  declaration = {k: v for k, v in declaration.items() if v is not None}
+       #                  if declaration.get("name"): # 确保 name 存在
+       #                      function_declarations.append(declaration)
 
-        if function_declarations:
-            data["tools"] = [{"function_declarations": function_declarations}]
+       #  if function_declarations:
+       #      data["tools"] = [{"function_declarations": function_declarations}]
 
-        # 2. 添加 tool_config (基于 tool_choice)
-        tool_config = None 
-        if request.tool_choice:
-            choice = request.tool_choice
-            mode = None
-            allowed_functions = None
-            if isinstance(choice, str):
-                if choice == "none":
-                    mode = "NONE"
-                elif choice == "auto":
-                    mode = "AUTO"
-            elif isinstance(choice, dict) and choice.get("type") == "function":
-                func_name = choice.get("function", {}).get("name")
-                if func_name:
-                    mode = "ANY" # 'ANY' 模式用于强制调用特定函数
-                    allowed_functions = [func_name]
+       #  # 2. 添加 tool_config (基于 tool_choice)
+       #  tool_config = None 
+       #  if request.tool_choice:
+       #      choice = request.tool_choice
+       #      mode = None
+       #      allowed_functions = None
+       #      if isinstance(choice, str):
+       #          if choice == "none":
+       #              mode = "NONE"
+       #          elif choice == "auto":
+       #              mode = "AUTO"
+       #      elif isinstance(choice, dict) and choice.get("type") == "function":
+       #          func_name = choice.get("function", {}).get("name")
+       #          if func_name:
+       #              mode = "ANY" # 'ANY' 模式用于强制调用特定函数
+       #              allowed_functions = [func_name]
             
-            # 如果成功解析出有效的 mode，构建 tool_config
-            if mode:
-                config = {"mode": mode}
-                if allowed_functions:
-                    config["allowed_function_names"] = allowed_functions
-                tool_config = {"function_calling_config": config}
+       #      # 如果成功解析出有效的 mode，构建 tool_config
+       #      if mode:
+       #          config = {"mode": mode}
+       #          if allowed_functions:
+       #              config["allowed_function_names"] = allowed_functions
+       #          tool_config = {"function_calling_config": config}
         
-        # 3. 添加 tool_config 到 data
-       if tool_config and function_declarations:
-            data["tool_config"] = tool_config
+       #  # 3. 添加 tool_config 到 data
+       # if tool_config and function_declarations:
+       #      data["tool_config"] = tool_config
 
-        if system_instruction:
-            data["system_instruction"] = system_instruction    
+       #  if system_instruction:
+       #      data["system_instruction"] = system_instruction    
         
-        return api_version, data
+       #  return api_version, data
     
 
     # 流式请求
